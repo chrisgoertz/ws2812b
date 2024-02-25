@@ -11,6 +11,8 @@
 
 extern TIM_HandleTypeDef htim1;
 extern bool datasendflag;
+static bool transfer_complete_flag;
+
 RGB_Color_t framebuffer[WS2812_FB_SIZE];
 
 void ws2812_fb_clear() { memset(framebuffer, 0x00, WS2812_FB_SIZE * 3); }
@@ -19,6 +21,14 @@ void ws2812_fb_send() {
   for (uint32_t i = 0; i < WS2812_FB_SIZE; i++) {
     ws2812_send_color(framebuffer[i]);
   }
+}
+
+void ws2812_transfer_complete(bool b){
+  transfer_complete_flag = b;
+}
+
+bool ws2812_is_transfer_complete(){
+  return transfer_complete_flag;
 }
 
 void ws2812_fb_set(RGB_Color_t color, uint32_t pos) {
@@ -49,10 +59,11 @@ void ws2812_send(int red, int green, int blue) {
   /* Send data to led strip */
   HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *)pwmData, DATASIZE);
   /* WAIT until DMA has send the data */
-  while (!datasendflag) {
+  while (!ws2812_is_transfer_complete()) {
   };
   /* ready to write next data */
-  datasendflag = false;
+  ws2812_transfer_complete(false);
+  
 }
 
 void ws2812_send_color(RGB_Color_t c) { ws2812_send(c.red, c.green, c.blue); }
@@ -64,9 +75,10 @@ void ws2812_reset() {
   }
   HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *)pwmData,
                         RESET_PULSES);
-  while (!datasendflag) {
+  while (!ws2812_is_transfer_complete()) {
   };
-  datasendflag = false;
+  ws2812_transfer_complete(false);
+  
 }
 
 void ws2812_red() { ws2812_send(5, 0, 0); }

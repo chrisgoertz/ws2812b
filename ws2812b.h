@@ -19,6 +19,7 @@
 
 /* includes */
 #include <stdint.h>
+#include <stdbool.h>
 
 /* Constants */
 #define WS2812_FB_SIZE (40)
@@ -42,6 +43,19 @@ void ws2812_fb_clear();
  */
 void ws2812_fb_send();
 
+/**
+ * @brief Set or reset the transfer complete flag.
+ * 
+ * @param b 
+ */
+void ws2812_transfer_complete(bool b);
+/**
+ * @brief Get state of data transfer
+ * 
+ * @return true = completed
+ * @return false = not yet completed
+ */
+bool ws18212_is_transfer_complete();
 /**
  * @brief Configure one particular pixel in framebuffer.
  * 
