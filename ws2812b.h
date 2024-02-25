@@ -21,7 +21,7 @@
 #include <stdint.h>
 
 /* Constants */
-#define WS2812_FB_SIZE (16)
+#define WS2812_FB_SIZE (40)
 
 /* Structs */
 typedef struct{
